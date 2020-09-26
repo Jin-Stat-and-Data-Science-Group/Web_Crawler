@@ -13,4 +13,18 @@
    
 **上面的每个函数都要能够输出excel表格**
 
-# 目标
+# 项目目标
+
+# 爬虫基础
+1. 网络知识
+2. 网页知识(html, css, javascript)
+3. 正则表达式
+4. 实现：Python 包
+   - urllib
+   - Requests
+   - BeautifulSoup4
+   - lxml
+   - Selenium
+   - pyspyder
+   - Scrapy
+
