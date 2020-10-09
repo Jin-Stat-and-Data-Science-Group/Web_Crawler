@@ -129,13 +129,13 @@ def getCollegeTeacherInfo2(url,teacherId):
 dat2 = pd.read_excel('./teacherInfoList1.xlsx')
 teacherInfo = []
 for i in range(len(dat2)):
-    time.sleep(0.1)
+    time.sleep(5)
     teacherInfo.append(getCollegeTeacherInfo2(dat2['个人主页'][200],dat2['教师ID'][200]))
     num = i % 50
     if num == 0:
         print('已爬取个数',i)
- #   if i == (len(dat2)-1):
- #       print('已全部完成')
+    if i == (len(dat2)-1):
+        print('已全部完成')
 
 teacherInfoList2 = []
 for j in teacherInfo:
