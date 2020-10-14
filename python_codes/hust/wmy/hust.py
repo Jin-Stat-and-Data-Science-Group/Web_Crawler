@@ -1,5 +1,6 @@
 import re
 import time
+import threading
 import requests
 import pandas as pd 
 from bs4 import BeautifulSoup
@@ -125,23 +126,36 @@ def getCollegeTeacherInfo2(url,teacherId):
         pass
     return teacherInfoList
 
+teacherInfotest = []
+dat = pd.read_excel('./teacherInfoList1.xlsx')
 
-dat2 = pd.read_excel('./teacherInfoList1.xlsx')
-teacherInfo = []
-for i in range(len(dat2)):
-    time.sleep(5)
-    teacherInfo.append(getCollegeTeacherInfo2(dat2['个人主页'][200],dat2['教师ID'][200]))
-    num = i % 50
-    if num == 0:
-        print('已爬取个数',i)
-    if i == (len(dat2)-1):
-        print('已全部完成')
+def fun(i):
+    time.sleep(1)
+    teacherInfotest.append(getCollegeTeacherInfo2(dat['个人主页'][i],dat['教师ID'][i]))
+
+def main():
+    for i in range(len(dat)):
+  #      num = i % 50
+  #      if num == 0:
+  #          print('一共1655例,已爬取个数 %d 例,已爬取百分之 %4.2f'%(i+1,(i+1)*100/len(dat)))
+  #      if i == (len(dat)-1):
+  #          print('一共1655例,已爬取个数 %d 例,已爬取百分之 %4.2f'%(i+1,(i+1)*100/len(dat)))
+        t = threading.Thread(target=fun,args=(i,))
+        t.start()
+if __name__ == "__main__":
+    main()
+
+teacherInfotest[1]
+len(teacherInfotest)
+
 
 teacherInfoList2 = []
-for j in teacherInfo:
+for j in teacherInfotest:
     teacherInfoList2 += j
+
 pd.DataFrame(teacherInfoList2)[['姓名','入职年份','学位','学历','学科','所在单位','科研项目信息','论文发表信息']].to_excel('./teacherInfoList2.xlsx')
 
 
 
-    
+
+

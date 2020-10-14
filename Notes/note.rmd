@@ -10,6 +10,12 @@ time.sleep(second)
 # 打印进度
 ```{python}
 
+for i in range(len(dat)):
+    num = i % 50
+    if num == 0:
+        print('一共1655例,已爬取个数 %d 例,已爬取百分之 %4.2f'%(i+1,(i+1)*100/len(dat)))
+    if i == (len(dat)-1):
+        print('一共1655例,已爬取个数 %d 例,已爬取百分之 %4.2f'%(i+1,(i+1)*100/len(dat)))
 
 
 ```
@@ -17,16 +23,15 @@ time.sleep(second)
 # 并行线程
 ```{python}
 import threading
-def test():
-    for i in range(10):
-        print(i)
-t1 = threading.Thread(target=test)
-t2 = threading.Thread(target=test)
-t3 = threading.Thread(target=test)
-t4 = threading.Thread(target=test)
-t1.start()
-t2.start()
-t3.start()
-t4.start()
+
+def fun(i):
+    print('thread id = %d \n'%i)
+def main():
+    for i in range(1,100000):
+        t = threading.Thread(target=fun,args=(i,))
+        t.start()
+
+if __name__ == "__main__":
+    main()
 
 ```
