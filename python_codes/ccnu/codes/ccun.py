@@ -41,7 +41,7 @@ import requests
 from bs4 import BeautifulSoup
 import os
 os.getcwd()
-urllist = pd.read_excel('../data/url.xlsx')
+urllist = pd.read_excel('../url.xlsx')
 ccun_url = 'http://foaie.ccnu.edu.cn'
 
 Headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:81.0) Gecko/20100101 Firefox/81.0'}
@@ -57,7 +57,7 @@ def rgznjxky(url):
         sss = rgznjxky_info[i].find_all("div",class_ = "sz-sznr yingyong")[0].ul.find_all("li",class_="sz-sznrulli")
         for j in range(len(sss)):
             teacherinfolist.append({"姓名":sss[j].a.string,
-                                    "学院":soup.head.title.get_text(),
+                                    "学院":'人工智能教育学部',
                                     "职称":rgznjxky_info[i].find_all('div',class_ = "xy-biaoti")[0].p.get_text(),
                                     "个人主页url":ccun_url + sss[j].a.get("href")[2:]})
     return pd.DataFrame(teacherinfolist)
@@ -75,7 +75,7 @@ def jyxyqtjs(url):
     for i in range(len(jy_allinfo)):
         for j in range(len(jy_allinfo[i].find_all("li"))):
             teacherinfolist.append({"姓名":jy_allinfo[i].find_all("li")[j].get_text(),
-                                   "学院":soup.head.title.get_text(),
+                                   "学院":'教育学院',
                                    "职称":jy_allinfo[i].h2.get_text(),
                                    "个人主页url":ccun_url + jy_allinfo[i].find_all("li")[j].a.get("href")[5:]})
     return pd.DataFrame(teacherinfolist)
@@ -91,7 +91,7 @@ def xlxyjslb(url):
     for i in range(len(soup.tbody.find_all("tr"))):
         try:
             teacherinfolist.append({"姓名":xl_allinfo[i].find_all("span")[0].string.replace("\xa0",''),
-                                   "学院":soup.title.text,
+                                   "学院":'心理学院',
                                    "职称":xl_allinfo[i].find_all("span")[1].string,
                                    "个人主页url":ccun_url + xl_allinfo[i].a.get("href")[2:]})
         except:
@@ -110,7 +110,7 @@ def wxyzhls(url):
         for j in range(len(wen_allinfo[i])):
             try:
                 teacherinfolist.append({"姓名":wen_allinfo[i].find_all("li")[j].a.text,
-                                        "学院":soup.title.get_text(),
+                                        "学院":'文学院',
                                         "职称":"",
                                         "个人主页url":wen_allinfo[0].find_all("li")[0].a.get("href")[2:]
             })
@@ -132,7 +132,7 @@ def xwcbzrjs(url):
     for i in range(len(xwcb_allinfo)):
         try:
             teacherinfolist.append({"姓名":xwcb_allinfo[i].a.span.string.replace("\u3000",""),
-                                    "学院":soup.title.get_text(),
+                                    "学院":'新闻传播学院',
                                     "职称":"",
                                     "个人主页url":ccun_url + xwcb_allinfo[i].a.get("href")[2:]})
         except:
@@ -149,7 +149,7 @@ def lswhjxky(url):
     teacherinfolist = []
     for i in range(len(lswh_allinfo)):
         teacherinfolist.append({"姓名":lswh_allinfo[i].span.text,
-                                "学院":soup.title.get_text(),
+                                "学院":'历史文化学院',
                                 "职称":"",
                                 "个人主页url":lswh_allinfo[i].get("href")
     })
@@ -165,7 +165,7 @@ def mkszyjxky(url):
     teacherinfolist = []
     for i in range(len(mkszy_allinfo)):
         teacherinfolist.append({"姓名":mkszy_allinfo[i].text.replace("\u3000","").strip()[0:3].replace("（",""),
-                                "学院":soup.title.get_text(),
+                                "学院":'马克思主义学院',
                                 "职称":mkszy_allinfo[i].text.replace("\u3000","").strip()[-4:-1],
                                 "个人主页url":ccun_url + mkszy_allinfo[0].get("href")[2:]
     })
@@ -182,7 +182,7 @@ def jjygsglxy(url):
     # teacherinfolist = []
     for i in range(1,len(jjygsgl_allinfo),1):
         teacherinfolist.append({"姓名":jjygsgl_allinfo[i].a.text[:3],
-                                "学院":soup.title.get_text(),
+                                "学院":'经济与工商管理学院',
                                 "职称":jjygsgl_allinfo[i].a.text[-4:-1].replace("（",""),
                                 "个人主页url":ccun_url + jjygsgl_allinfo[i].a.get("href")[2:]
             })
@@ -221,7 +221,7 @@ def ggglzzjs(url):
     for i in range(len(gggl_allinfo)):
         for j in range(len(gggl_allinfo[i].find_all("li"))):
             teacherinfolist.append({"姓名":gggl_allinfo[i].find_all("li")[j].text,
-                                    "学院":soup.title.get_text(),
+                                    "学院":'公共管理学院',
                                     "职称":"",
                                     "个人主页url":ccun_url + gggl_allinfo[i].find_all("li")[j].a.get("href")[2:]
     })
@@ -239,7 +239,7 @@ def rgznjxky(url):
     for i in [2,6,11]:
         for j in range(len(fxy_allinfo[2].find_all("a"))):
             teacherinfolist.append({"姓名":fxy_allinfo[i].find_all("a")[j].text,
-                                    "学院":soup.head.title.get_text(),
+                                    "学院":'法学院',
                                     "职称":"",
                                     "个人主页url":fxy_url + fxy_allinfo[i].find_all("a")[0].get("href")})
     return pd.DataFrame(teacherinfolist)
@@ -254,7 +254,7 @@ def shxyzrjs(url):
     shxy_allinfo = soup.find_all("li",class_= "pic-news")
     for i in range(len(shxy_allinfo)):
         teacherinfolist.append({"姓名":shxy_allinfo[i].find("a",class_ = "news-name").text,
-                                "学院":soup.title.get_text(),
+                                "学院":'社会学院',
                                 "职称":"",
                                 "个人主页url":ccun_url + shxy_allinfo[i].find("a",class_ = "news-name").get("href")[2:]
             })
@@ -281,7 +281,7 @@ def wgyxy(url):
     for i in range(len(wgy_allinfo)):
         for j in range(len(wgy_allinfo[i].find_all("li"))):
             teacherinfolist_wgy.append({"姓名":wgy_allinfo[i].find_all("li")[j].p.text,
-                                "学院":soup.title.get_text(),
+                                "学院":'外国语学院',
                                 "职称":wgy_allinfo[i].h4.text,
                                 "个人主页url":ccun_url + wgy_allinfo[i].find_all("li")[j].a.get("href")[2:]
             })
@@ -300,7 +300,7 @@ def xxglzrjs(url):
     for i in range(len(xxgl_allinfo)):
         for j in range(len(xxgl_allinfo[i].find_all("dd"))):
             teacherinfolist.append({"姓名":xxgl_allinfo[i].find_all("dd")[j].text,
-                                "学院":soup.title.get_text(),
+                                "学院":'信息管理学院',
                                 "职称":"",
                                 "个人主页url":xxgl_allinfo[i].find_all("dd")[j].a.get("href")
             })
@@ -315,7 +315,7 @@ def yyxy(url):
     yyxy_allinfo = soup.find_all("div",class_= "main_rpicR")
     for i in range(len(yyxy_allinfo)):
         teacherinfolist_yy.append({"姓名":yyxy_allinfo[i].h3.string,
-                                "学院":soup.title.get_text(),
+                                "学院":'音乐学院',
                                 "职称":"",
                                 "个人主页url":ccun_url + yyxy_allinfo[i].span.a.get("href")[2:]
             })
@@ -346,7 +346,7 @@ def tjysxszdw(url):
     tjysx_allinfo = soup.find_all("table",class_ = "table teacherList")[0].find_all("a")
     for i in range(len(tjysx_allinfo)):
         teacherinfolist_ts.append({"姓名":tjysx_allinfo[i].text,
-                                   "学院":soup.title.get_text(),
+                                   "学院":'数学与统计学院',
                                    "职称":soup.find("h4",class_ = "teacherTitle").text,
                                    "个人主页url":ccun_url + tjysx_allinfo[i].get("href")
             })
@@ -370,7 +370,7 @@ def wlkxyjs(url):
     for i in range(len(wl_allinfo)):
 
         teacherinfolist.append({"姓名":wl_allinfo[i].a.text[:4].replace("(",""),
-                                   "学院":soup.title.get_text(),
+                                   "学院":'物理科学与技术学院',
                                    "职称":re.findall(patt,wl_allinfo[0].a.text),
                                    "个人主页url":ccun_url + wl_allinfo[0].a.get("href")[2:]
             })
@@ -387,8 +387,8 @@ def hxxyszdw(url):
     for i in range(len(hx_allinfo.find_all("div",class_="title"))):
         for j in range(len(hx_allinfo.find_all("div",class_ = "name")[i].find_all("a"))):
             teacherinfolist.append({"姓名":hx_allinfo.find_all("div",class_ = "name")[i].find_all("a")[i].text,
-                                   "学院":soup.title.get_text(),
-                                   "职称":hx_allinfo.find_all("div",class_="title")[i],
+                                   "学院":'化学学院',
+                                   "职称":hx_allinfo.find_all("div",class_="title")[i].text,
                                    "个人主页url":ccun_url + '/' + hx_allinfo.find_all("div",class_ = "name")[i].find_all("a")[j].get("href")
             })
     return pd.DataFrame(teacherinfolist)
@@ -405,7 +405,7 @@ def smkxxyzrjs(url):
     for i in range(1,len(smkx_allinfo),1):
         try:
             teacherinfolist.append({"姓名":smkx_allinfo[i].a.text,
-                                   "学院":soup.title.get_text(),
+                                   "学院":'生命科学学院',
                                    "职称":smkx_allinfo[i].span.text,
                                    "个人主页url":ccun_url + smkx_allinfo[i].a.get("href")[5:]
             })
@@ -426,7 +426,7 @@ def jsjxyszyl(url):
     for i in range(len(jsj_allinfo)):
         for j in range(len(jsj_allinfo[i].find_all("a"))):
             teacherinfolist.append({"姓名":jsj_allinfo[i].find_all("a")[j].text,
-                                   "学院":soup.title.get_text(),
+                                   "学院":'计算机学院',
                                    "职称":zhicheng[i],
                                    "个人主页url":ccun_url + jsj_allinfo[i].find_all("a")[j].get("href")[2:]
             })
@@ -445,7 +445,7 @@ def csyhjkxxy(url):
     for i in range(3):
         for j in range(len(cshjkx_allinfo[i].find_all("a"))):
             teacherinfolist.append({"姓名":cshjkx_allinfo[i].find_all("a")[j].text.strip(),
-                                   "学院":soup.title.get_text(),
+                                   "学院":'城市与环境科学学院',
                                    "职称":zhicheng[i],
                                    "个人主页url":ccun_url + "/" + cshjkx_allinfo[i].find_all("a")[j].get("href")
             })
@@ -460,7 +460,7 @@ def zzygjgx(url):
     zzygjgx_allinfo = soup.find_all("div",class_="list")[0].find_all("li")
     for i in range(len(zzygjgx_allinfo)):
         teacherinfolist_zg.append({"姓名":zzygjgx_allinfo[i].a.text,
-                                   "学院":soup.title.get_text(),
+                                   "学院":'政治与国际关系学院',
                                    "职称":"",
                                    "个人主页url":ccun_url + zzygjgx_allinfo[0].a.get("href")[5:]
             })
@@ -481,7 +481,7 @@ def yyjyyjzx(url):
     teacherinfolist = []
     for i in range(1,len(yyjyyjzx_allinfo),1):
         teacherinfolist.append({"姓名":yyjyyjzx_allinfo[i].a.text,
-                                   "学院":soup.title.get_text(),
+                                   "学院":'语言与语言教育研究中心',
                                    "职称":yyjyyjzx_allinfo[i].find_all("td")[1].text,
                                    "个人主页url":ccun_url + "/" + yyjyyjzx_allinfo[i].a.get("href")[2:]
             })
@@ -497,7 +497,7 @@ def zgjdsyjs(url):
     zgjds_allinfo = soup.find_all("div",class_ = "right_bottom list")[0].find_all("a")
     for i in range(len(zgjds_allinfo)):
         teacherinfolist_jds.append({"姓名":zgjds_allinfo[i].text,
-                                   "学院":soup.title.get_text(),
+                                   "学院":'中国近代史研究所',
                                    "职称":"",
                                    "个人主页url":ccun_url + zgjds_allinfo[i].get("href")
             })
@@ -516,15 +516,11 @@ def gjwhcyyjzx(url):
     teacherinfolist = []
     for i in range(1,len(gjwh_allinfo),2):
         teacherinfolist.append({"姓名":gjwh_allinfo[1].text,
-                                "学院":soup.title.get_text(),
+                                "学院":'国家文化产业研究中心',
                                 "职称":"",
                                 "个人主页url":ccun_url + "/" + gjwh_allinfo[1].get("href")
             })
     return pd.DataFrame(teacherinfolist)
-gjwhcyyjzx(urllist.url[45]).to_excel("./data/国家文化产业研究中心.xlsx")
-dat1 = pd.read_excel("./data/城市与环境科学学院.xlsx")
-for info in os.listdir('./data'):
-    dat = pd.read_excel('../data/' + info)
-    dat1 = pd.concat([dat1,dat],ignore_index=True)
-dat1.to_excel("../data/teacherlisturl.xlsx")#导出所有教师的url信息
+gjwhcyyjzx(urllist.url[45]).to_excel("../data/国家文化产业研究中心.xlsx")
+
 
