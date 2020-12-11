@@ -1,3 +1,258 @@
+# 计算循环运行时间
+```{python}
+import datetime
+starttime = datetime.datetime.now() #开始时间
+a = []
+for i in range(10000000):
+    a.append(i)
+finishtime = datetime.datetime.now() #循环运行结束时间
+difftime = (finishtime-starttime).seconds #循环所用秒数
+print(difftime)
+```
+
+# 序列的重新排序
+np.random,shuffle作用就是重新排序返回一个随机序列作用类似洗牌,shuffle直接在原来的数组上进行操作，改变原来数组的顺序，无返回值.
+```{python}
+import numpy as np
+test = np.arange(10)
+np.random.shuffle(test)
+print(test)
+```
+
+
+# 爬虫之requests模块的使用
+## requests模块的介绍
+1. 概念：基于网络请求的模块
+2. 作用：用来模拟浏览器发送请求，从而实现爬虫
+3. 环境安装：在cmd里面执行`pip install requests`
+
+## requests模块基本用法
+### GET请求
+
+HTTP中最常见的请求之一就是GET请求，下面内容为利用requests构建GET请求的方法。
+
+#### 抓取网页
+
+`r=requests.get(url)`中`r`是一个`Response`对象，包含爬虫返回的内容
+`.get(url)`是一个`Request`对象，构造一个向服务器请求资源的Request。
+```{python}
+requests.get(url, params=None, **kwargs)
+url:获取html的网页的url
+params:url中的额外的参数，字典或字节流格式，可选
+```
+**<center>Response对象的属性</center>**
+
+|      属性 |          说明                |
+|--------------|--------------------|
+| r.status_code|HTTP请求的返回状态，200表示连接成功，404表示连接失败|
+|r.text|HTTP响应内容的字符串形式，即url对应的页面内容|
+|r.encoding|从HTTP header中猜测的相应内容编码方式|
+|r.apparent_encoding| 从内容中分析出的响应内容编码方式（备选编码方式）|
+|r.content| HTTP响应内容的二进制形式|
+
+```{python}
+import requests
+response = requests.get('http://httpbin.org/get')
+print(response.text)
+```
+返回值为：
+```
+{
+  "args": {}, 
+  "headers": {
+    "Accept": "*/*", 
+    "Accept-Encoding": "gzip, deflate", 
+    "Host": "httpbin.org", 
+    "User-Agent": "python-requests/2.24.0", 
+    "X-Amzn-Trace-Id": "Root=1-5fd214af-30f7f82232b749157c39c9b9"
+  }, 
+  "origin": "113.57.224.228", 
+  "url": "http://httpbin.org/get"
+}
+```
+#### 带参数的get请求
+将name和age传进去
+```{python}
+import requests
+response = requests.get('http://httpbin.org/get?name=germey&age=22')
+print(response.text)
+```
+或者可以使用params的方法：
+```{python}
+data = {
+ 'name': 'germey',
+ 'age': 22
+}
+response = requests.get("http://httpbin.org/get", params=data)
+print(response.text)
+```
+返回值为：
+```
+{
+  "args": {
+    "age": "22", 
+    "name": "germey"
+  }, 
+  "headers": {
+    "Accept": "*/*", 
+    "Accept-Encoding": "gzip, deflate", 
+    "Host": "httpbin.org", 
+    "User-Agent": "python-requests/2.24.0", 
+    "X-Amzn-Trace-Id": "Root=1-5fd215a7-5225d36c49bcb20226522e18"
+  }, 
+  "origin": "111.4.146.16", 
+  "url": "http://httpbin.org/get?name=germey&age=22"
+}
+```
+
+#### 解析json
+网页的返回类型实际上是str类型，但是它很特殊，是JSON格式的。所以，如果想直接解析返回结果，得到一个字典格式的话，可以直接调用json()方法。
+
+```{python}
+import requests
+import json
+
+response = requests.get("http://httpbin.org/get")
+print(type(response.text))
+print(response.json())
+print(json.loads(response.text))
+print(type(response.json()))
+
+```
+返回值为：
+```
+<class 'str'>
+{'args': {}, 'headers': {'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Host': 'httpbin.org', 'User-Agent': 'python-requests/2.24.0', 'X-Amzn-Trace-Id': 'Root=1-5fd21743-325f4941307f90664d2722d2'}, 'origin': '111.4.146.16', 'url': 'http://httpbin.org/get'}
+{'args': {}, 'headers': {'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'Host': 'httpbin.org', 'User-Agent': 'python-requests/2.24.0', 'X-Amzn-Trace-Id': 'Root=1-5fd21743-325f4941307f90664d2722d2'}, 'origin': '111.4.146.16', 'url': 'http://httpbin.org/get'}
+<class 'dict'>
+```
+
+#### 获取二进制数据
+返回.content就可以了
+
+```{python}
+import requests
+
+response = requests.get("https://github.com/favicon.ico")
+print(type(response.text),type(response.content))
+print(response.text)
+print(response.content)
+```
+
+#### 添加headers
+有些网站访问时必须带有浏览器等信息，如果不传入headers就会报错，如下：
+```{python}
+import requests
+
+response = requests.get("https://www.zhihu.com/explore")
+print(response.text)
+```
+但如果加上headers并加上User-Agent信息,就可爬取成功：
+```{python}
+import requests
+headers = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36"}
+response = requests.get("https://www.zhihu.com/explore",headers=headers)
+print(response.text)
+
+```
+
+### POST请求
+另外一种比较常见的请求方式为POST。
+```{python}
+import requests
+
+data = {'name': 'germey', 'age': '22'}
+response = requests.post("http://httpbin.org/post", data=data)
+print(response.text)
+```
+网站可以判断如果请求时POST方式，就把相关请求信息返回。
+
+运行结果为：
+可以发现返回结果里面，其中form部分就是提交的数据，这就证明POSTT请求成功发送了。
+```
+{
+  "args": {}, 
+  "data": "", 
+  "files": {}, 
+  "form": {
+    "age": "22", 
+    "name": "germey"
+  }, 
+  "headers": {
+    "Accept": "*/*", 
+    "Accept-Encoding": "gzip, deflate", 
+    "Content-Length": "18", 
+    "Content-Type": "application/x-www-form-urlencoded", 
+    "Host": "httpbin.org", 
+    "User-Agent": "python-requests/2.24.0", 
+    "X-Amzn-Trace-Id": "Root=1-5fd2d142-05714ddd08738ba67dc0fe2f"
+  }, 
+  "json": null, 
+  "origin": "113.57.224.228", 
+  "url": "http://httpbin.org/post"
+}
+```
+
+### 响应
+
+发送请求之后得到的就是响应，上面使用text和content获取了相应的内容。此外，还有很多属性和方法可以用来获取其他信息，比如状态码、响应头、Cookies等。示例如下：
+```{python}
+import requests
+
+response = requests.get('http://www.baidu.com')
+print(type(response.status_code), response.status_code)
+print(type(response.headers), response.headers)
+print(type(response.cookies), response.cookies)
+print(type(response.url), response.url)
+print(type(response.history), response.history)
+```
+常见的网页状态码判断：
+|  状态代码   |	  代码描述  |	处理方式     |
+|-----------|---------|------------|
+|200	|请求成功	|获得响应的内容，进行处理|
+|201	|请求完成，结果是创建了新资源，新创建资源的URI可在响应的实体中得到	|爬虫中不会遇到|
+|202	|请求被接受，但处理尚未完成	|阻塞等待|
+|204	|服务器端已经实现了请求，但是没有返回新的信息，如果客户是用户代理，则无需为此更新自身的文档视图|	丢弃|
+|300	|该状态码不被HTTP/1.0的应用程序直接使用，只是作为3XX类型回应的默认解释，存在多个可用的被请求资源	|若程序中能够处理，则进行进一步处理，如果程序中不能处理，则丢弃|
+|301|	请求到的资源都会分配一个永久的URL，这样就可以在将来通过该URL来访问此资源	|重定向到分配的URL|
+|302|	请求到的资源在一个不同的URL处临时保存	|重定向到分配的URL|
+|304	|请求的资源未更新|	丢弃|
+|400	|非法请求	|丢弃|
+|401	|未授权	|丢弃|
+|403	|禁止	|丢弃|
+|404	|没有找到	|丢弃|
+|5XX	|回应代码以“5”开头的状态码表示服务器端发现自己出现错误，不能继续执行请求	|丢弃|
+
+### 超时设置
+
+在本机网络状况不好或者服务器网络响应太慢甚至无响应时，我们可能会等待特别久的时间才可以收到响应，甚至收不到响应而报错。这就需要用到timeout参数。这个时间的计算是发出请求到服务器返回响应的时间。示例如下：
+```{python}
+import requests
+r = requests.get("https://www.taobao.com",timeout=1)
+print(r.status_code)
+```
+通过这样的方式，我们可以将超时时间设置为1秒，如果1秒内没有响应，那就抛出异常。
+
+
+### 爬取网页的通用代码框架
+```{python}
+import requests
+def getHTMLText(text):
+    try:
+        r = requests.get(url,timeout=30)
+        r.raise_for_status()#如果状态不是200，则会引发HTTPError异常
+        r.encoding = r.apparent_encoding
+        return r.text
+    except:
+        return "产生异常"
+if __name__ == "__main__":
+    url = "http://www.baidu.com"
+    print(getHTMLText(url))
+
+```
+
+
+
 # 等待时间
 
 每次爬虫操作设置一个等待时间，单位是秒数
