@@ -225,3 +225,76 @@
   
   返回组匹配的子字符串的开始和结束的索引;group默认值为零(表示整个匹配的子字符
   串)。如果组存在但没有匹配，则返回-1。
+
+
+# 以 teachercrawl.py 为例
+
+下面对 teachercrawl.py 文件中的正则表达式的函数应用进行回顾：
+
+**函数一：`re.compile()`**
+
+1. 使用情景：如果一个正则表达式要重复使用几千次，出于效率的考虑，应该先把这个正
+   则先**预编译**好，接下来重复使用时就不再需要编译这个步骤，直接匹配，从而提高
+   效率；
+
+2. 使用形式：`re.compile(pattern[, flag])`
+
+   1）`pattern` 是一个字符串形式的正则表达式；
+
+   2）`flag` 是一个可选参数，表示匹配模式，比如忽略大小写 `re.I`，多行模式 `re.S` 等。
+
+3. 从 `compile()` 函数的定义中，可以看出返回的是一个匹配对象，它单独使用就没有任何
+   意义，需要和 `findall()`, `search()`, `match()` 搭配使用:
+
+   1）`compile()`与`findall()`一起使用，返回一个列表。
+
+   2）`compile()`与`match()`一起使用，可返回一个`class`、`str`、`tuple`。
+
+**例1：**
+
+```{python}
+import re                # 正则表达式
+
+text = '师资队伍\n全院教师队伍\n硕士研究生导师\n博士研究生导师\n全院教师队伍\n当前位置：首页  师资队伍  全院教师队伍\n马克思主义基本原理教研部党支部书记、主任:荣枢'
+phrases = ['正文','正 *文','首页','首 *页','网站首页','位置','位 *置','当前所在位置']
+
+for i in phrases: 
+    if i in text:    # 判断 i 是否在 text 中
+        patt = re.compile(''.join((i,'.*')), re.S)    # 返回patten对象; re.S
+        text_output = re.findall(patt, text)[-1]      # 返回 i 后面所有文本
+print(text_output)
+
+print(re.findall('位置(.*)', text))         # 结果:['：首页  师资队伍  全院教师队伍']
+print(re.findall('位置(.*)', text, re.S))   # 结果：['：首页  师资队伍  全院教师队伍\n马克思主义基本原理教研部党支部书记、主任:荣枢']
+```
+
+**（补充说明）`re.S` : 匹配包括换行\n在内的所有字符**
+
+1. 如果不使用 `re.S` 参数，则只在每一行内进行匹配，如果一行没有，就换下一行重新开始，**不会跨行**。
+
+2. 而使用 `re.S` 参数以后，正则表达式会将这个字符串作为一个整体，将“\n”当做一个普通的字
+符加入到这个字符串中，**在整体中进行匹配**。
+
+
+**函数二：`re.sub()`**
+
+1. 使用形式：`re.sub(pattern, repl, string, count=0, flags=0)`
+
+   1）三个必选参数：`pattern` (表示正则中的模式字符串), `repl` (被替换的字符串的意
+   思), `string`(表示要被替换的那个字符串)；
+
+   2）两个可选参数：`count` (对于匹配到的内容，只处理其中一部分；默认0，作用是无限
+   替换下去), `flags`（表示匹配模式，比如忽略大小写 `re.I`，多行模式 `re.S` 等）。
+
+2. 函数作用：实现**正则替换**。
+
+**例2：**
+
+```{python}
+text_output=re.sub(r'([0-9a-z]{200,300})|(\xa0)|(\ufeff)|(\u3000)','',text_output)#把text_output中的 \xa0、\ufeff、\u3000 等字符替换成 " "，以及去除加密信息
+
+text_output=re.sub(r' +'," ", text_output)        # 把多个空格替换成一个空格
+text_output=re.sub(r'( ?\n)+',"\n", text_output)  # 把多个换行符替换成一个换行符
+text_output=re.sub(r'( ?\r)+',"\r", text_output)  # 把多个回车符替换成一个回车符
+cleanedtext=re.sub(r'( ?\t)+',"\t", text_output)  # 把多个横向制表符替换成一个横向制表符
+```
