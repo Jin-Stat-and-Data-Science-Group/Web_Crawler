@@ -1,37 +1,182 @@
-# 等待时间
+## BeautifulSoup
+1. 定义：BeautifulSoup 是 python 的一个库，它是一个工具箱，通过解析文档为用户提供需要抓取的数据。
+2. 功能：BeautifulSoup 提供一些简单的、python 式的函数用来处理导航、搜索、修改分析树等功能。最主要的功能是从网页抓取数据，BeautifulSoup 自动将输入文档转换为 Unicode 编码，输出文档转换为 utf-8 编码。
+3. 使用：`from bs4 import BeautifulSoup` 导入BeautifulSoup库
 
-每次爬虫操作设置一个等待时间，单位是秒数
+### 解析器    
+BeautifulSoup 支持 Python 标准库中的 HTML 解析器，还支持一些第三方的解析器。
+* Python标准库
+`BeautifulSoup(html, 'html.parser')`
+* lxml HTML解析库
+`BeautifulSoup(html, 'lxml')`
+* lxml XML解析库
+`BeautifulSoup(html,['lxml','xml'])`
+* htm5lib解析库
+`BeautifulSoup(html, 'html5lib')`
 
 ```{python}
-import time
-time.sleep(second)
+import requests
+from bs4 import BeautifulSoup
+req = requests.get("http://www.hzau.edu.cn/xxgk/yxsz.htm")
+req.encoding = 'utf-8'
+soup = BeautifulSoup(req.text,"html.parser")
+soup.text
 ```
 
-# 打印进度
 ```{python}
-
-for i in range(len(dat)):
-    num = i % 50
-    if num == 0:
-        print('一共1655例,已爬取个数 %d 例,已爬取百分之 %4.2f'%(i+1,(i+1)*100/len(dat)))
-    if i == (len(dat)-1):
-        print('一共1655例,已爬取个数 %d 例,已爬取百分之 %4.2f'%(i+1,(i+1)*100/len(dat)))
-
-
+import bs4
+from bs4 import BeautifulSoup
+import lxml
+import requests
+html = """
+<html><head><title>The Dormouse's story</title></head>
+<body>
+<p class="title" name="dromouse"><b>The Dormouse's story</b></p>
+<p class="story">Once upon a time there were three little sisters; and their names were
+<a href="http://example.com/elsie" class="sister" id="link1"><!-- Elsie --></a>,
+<a href="http://example.com/lacie" class="sister" id="link2">Lacie</a> and
+<a href="http://example.com/tillie" class="sister" id="link3">Tillie</a>;
+and they lived at the bottom of a well.</p>
+<p class="story">...</p>
+"""
+soup = BeautifulSoup(html)
 ```
 
-# 并行线程
+BeautifulSoup 将复杂 HTML 文档转换成一个复杂的树形结构，每个节点都是 Python 对象，所有对象可以归纳为 4 种:
+1. `Tag`
+HTML 中的一个个标签
 ```{python}
-import threading
+print(soup.title)
+print(soup.body)
+print(soup.a)
+print(soup.p)
+print(type(soup.a))
+soup.name
+soup.head.name
+soup.p.attrs
+soup.p['class']
+soup.p['class']="newClass"
+print(soup.p)
+del soup.p['class']
+print(soup.p)
+```
+2. `NavigableString`
+获取标签内部的文字，它的类型是一个 NavigableString
+```{python}
+print(soup.p.string)
+print(type(soup.p.string))
+```
 
-def fun(i):
-    print('thread id = %d \n'%i)
-def main():
-    for i in range(1,100000):
-        t = threading.Thread(target=fun,args=(i,))
-        t.start()
+3. `BeautifulSoup`
+表示一个文档的全部内容,可以把它当作 Tag 对象，可以分别获取它的类型，名称，以及属性
+```{python}
+print(type(soup.name))
+print(soup.name )
+print(soup.attrs )
+```
 
-if __name__ == "__main__":
-    main()
+4. `Comment`
+Comment 对象是一个特殊类型的 NavigableString 对象，其实输出的内容仍然不包括注释符号。如果一个标签里的内容是注释，利用` .string `来输出它的内容时会去除注释符号，此时它的类型为Comment 类型，因此一般在使用前先做一下判断。
+```{python}
+print(soup.a)
+print(soup.a.string)
+print(type(soup.a.string)) 
+if type(soup.a.string)==bs4.element.Comment:
+    print(soup.a.string)
+```
 
+## HTML
+1. 定义：超文本标记语言（HTML）是一种用于创建网页的标准标记语言。
+
+### HTML标签
+1. 定义：HTML 标签是由尖括号包围的关键词，比如 `<html>`
+2. 特点：
+* HTML 标签通常是成对出现的，比如 `<b> `和 `</b>`
+* 标签对中的第一个标签是开始标签，第二个标签是结束标签
+* 有些标签功能比较简单，使用一个标签即可。这种标签叫做自闭和标签.例如:` <br/> `，`<hr/>`，` <input /> `，`<img />`
+* 标签可以嵌套，但是不能交叉嵌套。
+
+### HTML构成
+html文件主要由`<head>`标签和`<body>`标签组成。在这两个标签的标签体中能够嵌套如下标签：
+1. `<head>`标签：`<!DOCTYPE > `，` <meta> `，` <title> `，` <link>`，` <style> `，` <script>` ；
+2. 其余标签都在`<body>`标签中嵌套。
+
+### 标签分类
+标签一般分为两种：
+1. 块级标签
+霸占一整行的标签。比如：`<h>`，`<p>`，`<div>`，`<form>`等；
+* 总是在新行上开始
+* 宽度缺省是它的容器的100%，除非设定一个宽度
+* 它可以容纳内联元素和其他块元素
+2. 行内标签
+可以多个标签共同占用一行的标签。比如：`<span>`，`<a>`，`<input>`，`<img>`，`<label>`等；
+* 和其他元素都在一行上
+* 宽度就是它的文字或图片的宽度，不可改变
+* 内联元素只能容纳文本或者其他内联元素
+
+### 特殊字符
+`&lt`； `&gt`；`&quot`；`&copy`；`&reg`
+
+### 标签属性
+* 通常是以键值对形式出现的. 例如 `name="aaron"`
+* 属性只能出现在 开始标签 或 自闭和标签中
+* 属性名字全部小写。 属性值必须使用双引号或单引号包裹，例如` name="aaron"`
+* 如果属性值和属性名完全一样，直接写属性名即可，例如` readonly`
+
+
+### 项目中主要涉及的标签：
+#### 基础标签
+`<!DOCTYPE>`：定义文档类型
+`<html>`：定义一个 HTML 文档
+`<title>`：为文档定义一个标题
+`<body>`：定义文档的主体
+`<h1> -- <h6>`：定义 HTML 标题
+`<p>`：定义一个段落
+`<br>`：定义简单的折行
+
+
+#### 样式/节
+`<style>`：定义文档的样式信息
+`<div>`：定义文档中的节
+`<span>`：定义文档中的节
+`<header>`：定义一个文档头部部分
+`<footer>`：定义一个文档底部
+`<section>`：定义了文档的某个区域
+`<aside>`：定义其所处内容之外的内容
+
+
+#### 元信息
+`<head>`：定义关于文档的信息
+
+###### 程序
+`<script>`：定义客户端脚本
+
+#### 链接
+`<a>`：定义一个链接
+
+#### 表格标签
+`<table>`：定义一个表格
+`<caption>`：定义表格的标题
+`<th>`：定义表格中的表头单元格
+`<tr>`：定义表格中的行
+`<td>`：定义表格中的单元
+`<thead>`：定义表格中的表头数据
+`<tbody>`：定义表格中的主体内容
+`<tfoot>`：定义表格中的表注内容
+
+#### 列表标签
+`<ul>`：定义一个无序列表
+`<ol>`：定义一个有序列表
+`<li>`：定义一个列表项
+`<dl>`：定义一个定义列表
+`<dt>`：定义一个定义列表中的项目
+`<dd>`：定义定义列表中项目的描述
+
+```{python}
+s.extract() for s in soup('script')
+soup.find('tbody')
+soup.find_all('a')
+soup.find_all('li')
+soup.find_all('a')[0].get('href')
+soup.find_all('a')[10].string
 ```
