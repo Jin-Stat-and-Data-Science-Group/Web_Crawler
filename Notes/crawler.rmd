@@ -289,5 +289,31 @@ if __name__ == "__main__":
 
 ```
 
+# 使用selenium包爬取数据
+
+在爬取教师主页时，利用模拟浏览器的方法爬取失败，状态代码为412，在添加了所有先决
+条件后依然失败，可能是网站设置了反爬虫机制，对此使用selenium包，并调用火狐浏览器
+进行爬取数据。
+
+使用该方法可以不用设置爬取的时间间隔。
+
+```{python}
+
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+import selenium.webdriver.support.ui as ui
+browser = webdriver.Firefox()
+browser.get(url)
+html = browser.page_source
+soup = BeautifulSoup(html, 'html.parser')
+
+```
+
+后续文本处理方法与从模拟浏览器爬取后处理的方法一致。
+
 
 
